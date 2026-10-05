@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Risikomanagement (DE) – Energieprojekte (LT/UW/Thermo/Kohle→Gas)</title>
+
+  <link id="appFavicon" rel="icon" type="image/svg+xml"
+        href='data:image/svg+xml;utf8,
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+          <rect width="64" height="64" rx="14" fill="%230f1933"/>
+          <path d="M38 8 18 36h12l-4 20 20-30H34l4-18z" fill="%2364b5f6"/>
+          <text x="10" y="58" font-family="Arial" font-size="12" fill="%23bcd1ff">RM</text>
+        </svg>' />
+
+  <style>
+    :root{
+      --bg:#0b1220; --card:#111a2e; --muted:#9fb0d0; --text:#e9efff; --accent:#64b5f6;
+      --good:#2ecc71; --warn:#f1c40f; --bad:#e67e22; --crit:#e74c3c;
+      --line:#233255; --chip:#1a2542; --panel:#0b1327;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    body{ margin:0; font-family:var(--sans); background:linear-gradient(180deg,#070c16, var(--bg)); color:var(--text); }
+
+    header{
+      padding:14px 16px; border-bottom:1px solid var(--line);
+      background:rgba(17,26,46,.78); backdrop-filter: blur(6px);
+      position:sticky; top:0; z-index:10;
+      display:flex; gap:12px; align-items:flex-start;
+    }
+    .brand{ display:flex; gap:10px; align-items:center; min-width:280px; }
+    .logo{
+      width:44px; height:44px; border-radius:12px; background:#0f1933; border:1px solid var(--line);
+      overflow:hidden; display:grid; place-items:center; flex:0 0 auto;
+    }
+    .logo img{ width:100%; height:100%; object-fit:cover; display:none; }
+    .logo svg{ width:26px; height:26px; display:block; }
+    header h1{ margin:0; font-size:14px; font-weight:950; letter-spacing:.2px; }
+    header .sub{ margin-top:4px; color:var(--muted); font-size:11px; line-height:1.35; max-width:980px; }
+
+    main{ max-width:1250px; margin:0 auto; padding:14px 16px 22px; }
+
+    .card{
+      background:rgba(17,26,46,.88); border:1px solid var(--line); border-radius:12px;
+      padding:14px; box-shadow: 0 8px 28px rgba(0,0,0,.25);
+    }
+
+    h2{ margin:0 0 10px 0; font-size:14px; }
+    h3{ margin:10px 0 8px 0; font-size:13px; color:#dbe6ff; }
+    .muted{ color:var(--muted); font-size:12px; line-height:1.45; }
+    .small{ font-size:11px; color:var(--muted); line-height:1.35; }
+    .mono{ font-family:var(--mono); font-size:11px; color:#cfe1ff; }
+
+    .row{ display:flex; gap:10px; flex-wrap: wrap; align-items:flex-end; }
+    label{ font-size:12px; color:#dbe6ff; }
+    input[type="text"], input[type="date"], input[type="number"], select, textarea{
+      background:var(--panel); color:var(--text); border:1px solid var(--line);
+      border-radius:10px; padding:8px 10px; font-size:12px; outline:none;
+    }
+    input[type="number"]{ width:72px; }
+    input[type="file"]{ color:var(--muted); font-size:12px; }
+
+    button{
+      background: linear-gradient(180deg, #2a6df4, #1d4ed8);
+      border:1px solid rgba(100,181,246,.35); color:#fff;
+      padding:9px 12px; border-radius:10px; cursor:pointer;
+      font-size:12px; font-weight:950;
+    }
+    button.secondary{ background:var(--panel); border:1px solid var(--line); color:var(--text); font-weight:900; }
+    button.tab{
+      background:rgba(11,19,39,.7); border:1px solid rgba(35,50,85,.9); color:#cfe1ff;
+      font-weight:950; padding:9px 12px;
+    }
+    button.tab.active{
+      background:linear-gradient(180deg, rgba(100,181,246,.35), rgba(29,78,216,.35));
+      border-color:rgba(100,181,246,.55); color:#ffffff;
+    }
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+
+    fieldset{ border:1px solid var(--line); border-radius:12px; padding:10px; margin:10px 0; }
+    legend{ padding:0 8px; color:#dbe6ff; font-size:12px; font-weight:1000; }
+
+    .checks{ display:grid; grid-template-columns:1fr; gap:8px; }
+    @media (min-width: 900px){ .checks{ grid-template-columns:1fr 1fr; } }
+
+    .check{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:9px 10px; border-radius:12px;
+      background: rgba(10,16,32,.60); border:1px solid rgba(35,50,85,.75);
+    }
+    .check input{ margin-top:3px; transform: scale(1.05); }
+    .check .t{ font-size:12px; line-height:1.25; font-weight:1000; color:#e9efff; }
+    .check .d{ margin-top:3px; font-size:11px; line-height:1.35; color:var(--muted); }
+    .check .r{ margin-top:6px; font-size:11px; color:#bcd1ff; }
+    .check .code{ margin-top:6px; font-size:11px; font-family:var(--mono); color:#cfe1ff; opacity:.9; }
+
+    .chip{
+      display:inline-block; background:var(--chip); border:1px solid rgba(35,50,85,.9);
+      padding:2px 8px; border-radius:999px; font-size:11px; color:#dbe6ff;
+      margin:2px 4px 0 0;
+    }
+
+    .table-wrap{
+      margin-top:10px; border:1px solid var(--line); border-radius:12px;
+      overflow:auto; max-height: 560px; background: rgba(10,16,32,.35);
+    }
+    table{ width:100%; border-collapse:separate; border-spacing:0; min-width: 1120px; }
+    th, td{ border-bottom:1px solid rgba(35,50,85,.8); padding:8px 8px; vertical-align:top; }
+    th{
+      position:sticky; top:0; z-index:2;
+      background:#0f1933; font-size:11px; text-transform:uppercase;
+      letter-spacing:.6px; color:#bcd1ff;
+    }
+    td{ font-size:12px; }
+    tr:last-child td{ border-bottom:none; }
+
+    .lvl{ font-weight:1000; padding:2px 8px; border-radius:999px; display:inline-block; font-size:11px; border:1px solid rgba(255,255,255,.1); }
+    .lvl.low{ background:rgba(46,204,113,.16); color:#b7f3cd; border-color:rgba(46,204,113,.35); }
+    .lvl.med{ background:rgba(241,196,15,.16); color:#ffeaa7; border-color:rgba(241,196,15,.35); }
+    .lvl.high{ background:rgba(230,126,34,.16); color:#ffd3a8; border-color:rgba(230,126,34,.35); }
+    .lvl.crit{ background:rgba(231,76,60,.16); color:#ffb4ad; border-color:rgba(231,76,60,.35); }
+    .critical-row{ outline:2px solid rgba(231,76,60,.35); background:rgba(231,76,60,.06); }
+
+    .grid2{ display:grid; grid-template-columns: 1fr; gap:12px; }
+    @media (min-width: 1000px){ .grid2{ grid-template-columns: 1.2fr .8fr; } }
+
+    .tools{ display:flex; gap:8px; flex-wrap:wrap; }
+    .panel{ display:none; }
+    .panel.active{ display:block; }
+    .footer-note{ margin-top:10px; font-size:11px; color:var(--muted); line-height:1.45; }
+
+    .errorbar{
+      display:none;
+      margin: 12px 0 0 0;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(231,76,60,.55);
+      background: rgba(231,76,60,.12);
+      color:#ffb4ad;
+      font-size:12px;
+      line-height:1.35;
+      white-space: pre-wrap;
+    }
+    .kbd { font-family:var(--mono); font-size:11px; color:#dbe6ff; padding:2px 6px; border:1px solid rgba(35,50,85,.8); border-radius:8px; background:rgba(11,19,39,.6); }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="brand">
+    <div class="logo" aria-label="Logo">
+      <img id="brandLogoImg" alt="Logo"/>
+      <svg id="brandLogoFallback" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M14 2 5 14h7l-2 8 9-13h-7l2-7Z" fill="#64b5f6"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Risikomanagement – Parametrischer Generator (DE)</h1>
+      <div class="sub">
+        Energieprojekte: Übertragungsleitungen, Umspannwerke, Thermokraftwerke, Kohle→Gas.
+        Auswahl per Checkboxen erzeugt Anforderungen, Risiken, Maßnahmen, Terminplan (CPM) und PDF‑Abschlussbericht (SLA + Task‑Anchors).<br/>
+        Keine Rechtsberatung.
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div id="errorBar" class="errorbar"></div>
+
+  <div class="tabs card" style="padding:10px 12px;">
+    <button class="tab active" data-tab="tab-config">Konfiguration</button>
+    <button class="tab" data-tab="tab-req">Anforderungen</button>
+    <button class="tab" data-tab="tab-risk">Risiken</button>
+    <button class="tab" data-tab="tab-sched">Terminplan</button>
+    <button class="tab" data-tab="tab-report">Report/Export</button>
+  </div>
+
+  <!-- TAB: CONFIG -->
+  <section id="tab-config" class="panel active">
+    <div class="grid2" style="margin-top:12px">
+
+      <section class="card">
+        <h2>1) Projektkonfiguration</h2>
+
+        <div class="row">
+          <label>Projektname<br/>
+            <input id="projectName" type="text" placeholder="z.B. Leitung + UW + Kohle→Gas" style="min-width:320px"/>
+          </label>
+          <label>Projektstart (CPM &amp; SLA)<br/>
+            <input id="projectStart" type="date"/>
+          </label>
+          <label>Risikobewertung – Schwellen<br/>
+            <select id="thresholdPreset">
+              <option value="default" selected>Standard (1–4 niedrig, 5–9 mittel, 10–16 hoch, 17–25 kritisch)</option>
+              <option value="conservative">Konservativ (1–3 niedrig, 4–8 mittel, 9–15 hoch, 16–25 kritisch)</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="tools" style="margin-top:10px">
+          <button id="btnGenerate">Generieren / Aktualisieren</button>
+          <button class="secondary" id="btnSave">Speichern</button>
+          <button class="secondary" id="btnLoad">Laden</button>
+          <button class="secondary" id="btnReset">Reset</button>
+        </div>
+
+        <fieldset>
+          <legend>Branding (Logo/Favicon)</legend>
+          <div class="muted">
+            Option A: Lege eine Datei <span class="kbd">logo.png</span> in denselben Ordner wie diese HTML-Datei (wird automatisch geladen).<br/>
+            Option B: Upload unten (wird lokal in <span class="kbd">localStorage</span> gespeichert und in PDF verwendet).
+          </div>
+          <div class="row" style="margin-top:10px">
+            <label>Logo Upload (PNG/JPG)<br/>
+              <input id="logoUpload" type="file" accept="image/*" />
+            </label>
+            <button class="secondary" id="btnClearLogo">Logo entfernen</button>
+          </div>
+          <div class="small" style="margin-top:8px">
+            Empfehlung: quadratisch (z.B. 512×512). Das System skaliert auf 256px (PNG), damit nichts „hängt“.
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Module / Umfang</legend>
+          <div class="checks" id="group_scope"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Genehmigungen / Verfahren</legend>
+          <div class="checks" id="group_permitting"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Umwelt / Raum</legend>
+          <div class="checks" id="group_environment"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Prozess-/Anlagensicherheit &amp; Industrie</legend>
+          <div class="checks" id="group_process"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Netz / Betrieb / OT-IT</legend>
+          <div class="checks" id="group_grid"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Bau / HSE</legend>
+          <div class="checks" id="group_hse"></div>
+        </fieldset>
+
+        <div class="footer-note">
+          Tipp: Im Terminplan Dauern überschreiben und dann <b>Generieren</b> klicken (CPM + SLA aktualisieren).
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>2) Überblick</h2>
+        <h3>Aktive Merkmale</h3>
+        <div id="activeFeatures" class="small">—</div>
+
+        <h3 style="margin-top:12px">Zähler</h3>
+        <div class="small" id="counts">—</div>
+
+        <h3 style="margin-top:12px">Debug</h3>
+        <div class="small">
+          Wenn etwas „hängt“: öffnen Sie die Browser-Konsole (<span class="kbd">F12</span>) und kopieren Sie die Fehlermeldung hierher.
+          Das App zeigt Fehler auch oben in Rot.
+        </div>
+      </section>
+
+    </div>
+  </section>
+
+  <!-- TAB: REQUIREMENTS -->
+  <section id="tab-req" class="panel">
+    <div class="card" style="margin-top:12px">
+      <h2>Anwendbare Anforderungen (Legal/Normen Register)</h2>
+      <div class="muted">Automatisch gefiltert nach Auswahl. „Evidenzen/Deliverables“ sind als Audit‑Checkliste nutzbar.</div>
+      <div class="table-wrap">
+        <table id="tblReq">
+          <thead>
+            <tr>
+              <th>ID</th><th>Thema</th><th>Referenz</th><th>Pflicht/Zweck</th><th>Evidenzen</th><th>Trigger</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: RISKS -->
+  <section id="tab-risk" class="panel">
+    <div class="card" style="margin-top:12px">
+      <h2>Risikoregister (P×I) mit Maßnahmen</h2>
+      <div class="muted">P/I (1–5) ist überschreibbar. Score &amp; Stufe werden live berechnet.</div>
+      <div class="table-wrap">
+        <table id="tblRisk">
+          <thead>
+            <tr>
+              <th>ID</th><th>Kategorie</th><th>Risiko</th><th>Ursache/Trigger</th><th>Anforderungen</th>
+              <th>P</th><th>I</th><th>Score</th><th>Stufe</th>
+              <th>Prävention</th><th>Monitoring</th><th>Kontingenz</th><th>Owner</th><th>Gate</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: SCHEDULE -->
+  <section id="tab-sched" class="panel">
+    <div class="card" style="margin-top:12px">
+      <h2>Terminplan (WBS) inkl. Kritischer Pfad (CPM)</h2>
+      <div class="muted">Dauer ist editierbar; danach „Generieren/Aktualisieren“ klicken. Kritische Vorgänge (Float=0) sind markiert.</div>
+      <div class="table-wrap">
+        <table id="tblSched">
+          <thead>
+            <tr>
+              <th>ID</th><th>Tätigkeit</th><th>Modul</th><th>Dauer</th><th>Vorgänger</th>
+              <th>ES</th><th>EF</th><th>LS</th><th>LF</th><th>Float</th><th>Kritisch</th>
+              <th>Deliverable</th><th>Owner</th><th>Gate</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="footer-note" id="schedNote"></div>
+    </div>
+  </section>
+
+  <!-- TAB: REPORT -->
+  <section id="tab-report" class="panel">
+    <div class="card" style="margin-top:12px">
+      <h2>Report / Export</h2>
+      <div class="tools">
+        <button class="secondary" id="btnExportReq">CSV: Anforderungen</button>
+        <button class="secondary" id="btnExportRisk">CSV: Risiken</button>
+        <button class="secondary" id="btnExportSched">CSV: Terminplan</button>
+        <button class="secondary" id="btnExportJSON">JSON: Alles</button>
+        <button id="btnExportPDF">PDF: Abschlussbericht</button>
+      </div>
+      <div class="footer-note">
+        PDF: Merkmale, Anforderungen, Risikoübersicht, SLA‑Fälligkeiten (Gate + Anchors) und Detailanalyse.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ============================================================
+   Error handling (avoids "silent freeze")
+   ============================================================ */
+const errorBar = document.getElementById("errorBar");
+function showError(msg){
+  errorBar.style.display = "block";
+  errorBar.textContent = "Fehler:\n" + msg;
+}
+window.addEventListener("error", (e)=> showError(e.message || String(e.error || e)));
+window.addEventListener("unhandledrejection", (e)=> showError(e.reason?.message || String(e.reason || e)));
+
+/* ============================================================
+   Tabs
+   ============================================================ */
+function setActiveTab(tabId){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
+  document.querySelectorAll("button.tab").forEach(b=>{
+    b.classList.toggle("active", b.dataset.tab === tabId);
+  });
+}
+document.querySelectorAll("button.tab").forEach(b=>{
+  b.addEventListener("click", ()=> setActiveTab(b.dataset.tab));
+});
+
+/* ============================================================
+   Helpers
+   ============================================================ */
+function el(tag, attrs={}, ...children){
+  const e = document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k==="class") e.className=v;
+    else if(k==="html") e.innerHTML=v;
+    else e.setAttribute(k,v);
+  }
+  for(const c of children){
+    if(c==null) continue;
+    if(typeof c==="string") e.appendChild(document.createTextNode(c));
+    else e.appendChild(c);
+  }
+  return e;
+}
+function clamp(min, x, max){ return Math.max(min, Math.min(max, x)); }
+
+/* ============================================================
+   Branding (logo.png fallback + upload)
+   ============================================================ */
+const BRANDING_KEY = "riskMatrixBranding_v3";
+
+function loadBranding(){
+  try{ return JSON.parse(localStorage.getItem(BRANDING_KEY) || '{"logoDataUrl":null}'); }
+  catch{ return {logoDataUrl:null}; }
+}
+function saveBranding(b){
+  try{ localStorage.setItem(BRANDING_KEY, JSON.stringify(b)); } catch(e){ /* ignore */ }
+}
+
+function applyLogoToHeader(dataUrl){
+  const img = document.getElementById("brandLogoImg");
+  const fallback = document.getElementById("brandLogoFallback");
+  if(dataUrl){
+    img.src = dataUrl;
+    img.style.display = "block";
+    fallback.style.display = "none";
+    setFaviconFromDataUrl(dataUrl);
+  }else{
+    img.removeAttribute("src");
+    img.style.display = "none";
+    fallback.style.display = "block";
+  }
+}
+
+function setFaviconFromDataUrl(dataUrl){
+  if(!dataUrl) return;
+  // recreate link to avoid caching issues
+  const old = document.getElementById("appFavicon");
+  const link = document.createElement("link");
+  link.id = "appFavicon";
+  link.rel = "icon";
+  link.type = "image/png";
+  link.href = dataUrl;
+  if(old) old.remove();
+  document.head.appendChild(link);
+}
+
+async function tryLoadDefaultLogoFile(){
+  // if logo is not set in localStorage, try ./logo.png
+  return new Promise((resolve)=>{
+    const testImg = new Image();
+    testImg.onload = async ()=> {
+      try{
+        // draw into canvas and store as PNG dataURL (fast, stable for jsPDF)
+        const maxSize = 256;
+        const scale = Math.min(1, maxSize / Math.max(testImg.width, testImg.height));
+        const w = Math.max(1, Math.round(testImg.width * scale));
+        const h = Math.max(1, Math.round(testImg.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d").drawImage(testImg, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/png", 0.92));
+      } catch { resolve(null); }
+    };
+    testImg.onerror = ()=> resolve(null);
+    testImg.src = "logo.png";
+  });
+}
+
+async function resizeUploadToDataUrl(file, maxSize=256){
+  const dataUrl = await new Promise((resolve, reject)=>{
+    const fr = new FileReader();
+    fr.onload = ()=> resolve(fr.result);
+    fr.onerror = reject;
+    fr.readAsDataURL(file);
+  });
+
+  const img = await new Promise((resolve, reject)=>{
+    const im = new Image();
+    im.onload = ()=> resolve(im);
+    im.onerror = reject;
+    im.src = dataUrl;
+  });
+
+  const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+  const w = Math.max(1, Math.round(img.width * scale));
+  const h = Math.max(1, Math.round(img.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+  return canvas.toDataURL("image/png", 0.92);
+}
+
+document.getElementById("logoUpload").addEventListener("change", async (e)=>{
+  const file = e.target.files?.[0];
+  if(!file) return;
+  try{
+    const resized = await resizeUploadToDataUrl(file, 256);
+    saveBranding({logoDataUrl: resized});
+    applyLogoToHeader(resized);
+    alert("Logo gespeichert und angewendet.");
+  }catch(err){
+    showError("Logo konnte nicht verarbeitet werden: " + (err?.message || String(err)));
+  }finally{
+    e.target.value = "";
+  }
+});
+document.getElementById("btnClearLogo").addEventListener("click", ()=>{
+  saveBranding({logoDataUrl:null});
+  applyLogoToHeader(null);
+  alert("Logo entfernt.");
+});
+
+function guessImageTypeFromDataUrl(dataUrl){
+  if(!dataUrl) return null;
+  if(dataUrl.startsWith("data:image/png")) return "PNG";
+  if(dataUrl.startsWith("data:image/jpeg") || dataUrl.startsWith("data:image/jpg")) return "JPEG";
+  return "PNG";
+}
+
+/* ============================================================
+   Features (selectable with explanations)
+   ============================================================ */
+const FEATURES = [
+  // scope
+  {id:"MOD_LINIE", group:"scope", title:"Übertragungs-/Hochspannungsleitung (Freileitung/Kabel)",
+   desc:"Aktiviert Leitungs-spezifische Anforderungen/Risiken (Trasse, ROW/Servituten, Montagefenster, Betrieb).",
+   refs:"DIN EN 50341; DIN EN 60826; DIN VDE 0105-100"},
+  {id:"MOD_UMSPANN", group:"scope", title:"Umspannwerk / Schaltanlage (AIS/GIS)",
+   desc:"Aktiviert Erdung/Schutz, Schaltgeräte, Abnahmen und TSO/DSO-Interfaces.",
+   refs:"DIN EN 61936-1; DIN EN 50522; IEC 62271"},
+  {id:"MOD_THERMO", group:"scope", title:"Thermisches Kraftwerk (Bestand/Neubau, z.B. GuD)",
+   desc:"Aktiviert Immissionsschutz, Prozess-/Betriebssicherheit und ggf. ETS/MRV.",
+   refs:"BImSchG; TA Luft; TA Lärm; TEHG"},
+  {id:"MOD_COAL2GAS", group:"scope", title:"Konversion Kohle → Gas (Umbau/Repowering)",
+   desc:"Umbau im Bestand: Demontage, Altlasten/Asbest, Prozessänderungen, Genehmigungsänderung.",
+   refs:"BImSchG; GefStoffV/TRGS; KrWG"},
+  {id:"MOD_GAS_CONN", group:"scope", title:"Gasanbindung / Gasnetz-Interface",
+   desc:"Schnittstelle zum Gasnetz (Druck/Qualität/Kapazität) als potenzieller kritischer Pfad.",
+   refs:"EnWG; DVGW (scopeabhängig)"},
+  {id:"MOD_SCADA", group:"scope", title:"Leittechnik/SCADA/Telekommunikation (OT)",
+   desc:"OT-Security, Segmentierung/Remote-Access und Abnahmetests (z.B. Teleprotektion).",
+   refs:"IEC 62443; ggf. BSIG/BSI-KRITIS"},
+  {id:"MOD_DEMO", group:"scope", title:"Rückbau/Demontage/Abbruch im Bestand",
+   desc:"TRGS-konforme Rückbau-/Schadstoff-/Entsorgungsprozesse.",
+   refs:"GefStoffV/TRGS; KrWG"},
+
+  // permitting
+  {id:"PERM_PLANFEST", group:"permitting", title:"Planfeststellungsverfahren / Linieninfrastruktur",
+   desc:"Genehmigungskette inkl. Einwendungsmanagement (typisch Leitung/Trasse).",
+   refs:"EnWG; NABEG; BBPlG (projektabhängig)"},
+  {id:"PERM_BIMSCHG", group:"permitting", title:"Genehmigung nach BImSchG (Industrieanlage)",
+   desc:"BImSchG-Antrag/Auflagenmanagement für Industrie-/Kraftwerksanlage.",
+   refs:"BImSchG; 4. BImSchV"},
+  {id:"PERM_UVPG", group:"permitting", title:"UVP / EIA erforderlich (UVPG)",
+   desc:"UVP-Prozess (Scoping, Umweltbericht, Beteiligung). Saisonale Kartierungen möglich.",
+   refs:"UVPG"},
+  {id:"PERM_WHG", group:"permitting", title:"Wasserrecht (WHG) relevant",
+   desc:"Wasserrechtliche Genehmigungen (Querungen, Einleitungen, Schutzgebiete).",
+   refs:"WHG + Landesrecht"},
+
+  // environment
+  {id:"ENV_NATURA", group:"environment", title:"Natura 2000 / FFH betroffen",
+   desc:"FFH-Verträglichkeitsprüfung, strengere Nachweise, Kompensation/Vermeidung.",
+   refs:"BNatSchG; FFH-/Vogelschutz-RL"},
+  {id:"ENV_SPECIES", group:"environment", title:"Arten-/Vogelschutz betroffen",
+   desc:"Bauzeitfenster, Monitoring und Vermeidungsmaßnahmen.",
+   refs:"BNatSchG"},
+  {id:"ENV_WATER_CROSS", group:"environment", title:"Gewässerquerung betroffen",
+   desc:"Zusätzliche Bauverfahren und Hochwasserrisiken.",
+   refs:"WHG"},
+
+  // process
+  {id:"PROC_ATEX", group:"process", title:"ATEX / Explosionsschutz relevant",
+   desc:"Zonenklassifikation, Ex-Geräteauswahl, Inspektionen.",
+   refs:"ATEX 2014/34/EU; 1999/92/EG; BetrSichV"},
+  {id:"PROC_PED", group:"process", title:"Druckgeräte/Druckleitungen (PED) relevant",
+   desc:"Druckgeräte-Compliance (Klassifizierung, Notified Body, Doku, NDT).",
+   refs:"PED 2014/68/EU; EN 13480"},
+  {id:"PROC_SIS", group:"process", title:"SIS/SIL erforderlich (Functional Safety)",
+   desc:"HAZOP/LOPA, SIL-Zuweisung, SRS, Verifikation, MOC.",
+   refs:"IEC 61511"},
+
+  // grid
+  {id:"GRID_TSO", group:"grid", title:"TSO/DSO-Anforderungen (Anschluss/Abnahme/Schutz)",
+   desc:"Interface Register, Abnahmepläne und SAT-Kette.",
+   refs:"TSO/DSO Spezifikationen; EnWG"},
+  {id:"GRID_CYBER", group:"grid", title:"OT-Cybersecurity (IEC 62443) gefordert",
+   desc:"Security-Konzept, Segmentierung, Hardening, Access, Patch/Vuln Mgmt.",
+   refs:"IEC 62443"},
+
+  // hse
+  {id:"HSE_BAUSTELLV", group:"hse", title:"BaustellV / SiGe-Koordination erforderlich",
+   desc:"SiGe-Plan, Unterweisungen, PTW/LOTO und Audits.",
+   refs:"ArbSchG; BaustellV; DGUV"},
+  {id:"HSE_HEIGHT", group:"hse", title:"Arbeiten in der Höhe",
+   desc:"Absturzrisiken, Rettungskette, Stop‑Work‑Kontrollen.",
+   refs:"DGUV (tätigkeitsabhängig)"},
+];
+
+function renderCheckboxGroups(){
+  const containers = {
+    scope: document.getElementById("group_scope"),
+    permitting: document.getElementById("group_permitting"),
+    environment: document.getElementById("group_environment"),
+    process: document.getElementById("group_process"),
+    grid: document.getElementById("group_grid"),
+    hse: document.getElementById("group_hse")
+  };
+  Object.values(containers).forEach(c=>c.innerHTML="");
+
+  FEATURES.forEach(f=>{
+    const id = "chk_"+f.id;
+    const box = el("input",{type:"checkbox", id});
+    const content = el("div",{},
+      el("div",{class:"t"}, f.title),
+      el("div",{class:"d"}, f.desc || ""),
+      f.refs ? el("div",{class:"r"}, "Referenzen: " + f.refs) : null,
+      el("div",{class:"code"}, f.id)
+    );
+    const wrap = el("label",{class:"check", for:id}, box, content);
+    containers[f.group].appendChild(wrap);
+  });
+}
+
+/* ============================================================
+   Applicability
+   ============================================================ */
+function getSelectedFeatureSet(){
+  const sel = new Set();
+  for(const f of FEATURES){
+    const chk = document.getElementById("chk_"+f.id);
+    if(chk && chk.checked) sel.add(f.id);
+  }
+  return sel;
+}
+function isApplicable(item, selected){
+  const all = item.all || [];
+  const any = item.any || [];
+  const okAll = all.length ? all.every(x=>selected.has(x)) : true;
+  const okAny = any.length ? any.some(x=>selected.has(x)) : true;
+  return okAll && okAny;
+}
+
+/* ============================================================
+   Risk scoring
+   ============================================================ */
+function riskLevel(score, preset="default"){
+  if(preset==="conservative"){
+    if(score>=16) return {lvl:"Kritisch", cls:"crit"};
+    if(score>=9)  return {lvl:"Hoch", cls:"high"};
+    if(score>=4)  return {lvl:"Mittel", cls:"med"};
+    return {lvl:"Niedrig", cls:"low"};
+  }
+  if(score>=17) return {lvl:"Kritisch", cls:"crit"};
+  if(score>=10) return {lvl:"Hoch", cls:"high"};
+  if(score>=5)  return {lvl:"Mittel", cls:"med"};
+  return {lvl:"Niedrig", cls:"low"};
+}
+function levelColor(level){
+  switch(level){
+    case "Kritisch": return [231,76,60];
+    case "Hoch":     return [230,126,34];
+    case "Mittel":   return [241,196,15];
+    default:         return [46,204,113];
+  }
+}
+
+/* ============================================================
+   CPM
+   ============================================================ */
+function parsePred(pred){
+  if(!pred) return [];
+  if(Array.isArray(pred)) return pred;
+  return String(pred).split(";").map(s=>s.trim()).filter(Boolean);
+}
+function computeCPM(appTasks){
+  const map = new Map(appTasks.map(t=>[t.id, {...t, pred: parsePred(t.pred)}]));
+  for(const t of map.values()) t.pred = t.pred.filter(p=>map.has(p));
+
+  const succ = new Map(), indeg = new Map();
+  for(const id of map.keys()){ succ.set(id, []); indeg.set(id, 0); }
+  for(const t of map.values()){
+    for(const p of t.pred){
+      succ.get(p).push(t.id);
+      indeg.set(t.id, indeg.get(t.id)+1);
+    }
+  }
+
+  const q = [];
+  for(const [id,deg] of indeg.entries()) if(deg===0) q.push(id);
+  const topo = [];
+  while(q.length){
+    const id = q.shift();
+    topo.push(id);
+    for(const s of succ.get(id)){
+      indeg.set(s, indeg.get(s)-1);
+      if(indeg.get(s)===0) q.push(s);
+    }
+  }
+  if(topo.length !== map.size){
+    return { ok:false, error:"Zyklus in Vorgängerketten erkannt (CPM nicht berechenbar).", tasks:[...map.values()] };
+  }
+
+  for(const id of topo){
+    const t = map.get(id);
+    const es = t.pred.length ? Math.max(...t.pred.map(p=>map.get(p).EF)) : 0;
+    t.ES = es; t.EF = es + Number(t.dur||0);
+  }
+  const projectDuration = Math.max(...[...map.values()].map(t=>t.EF), 0);
+
+  for(const t of map.values()){
+    t.LF = projectDuration; t.LS = projectDuration - Number(t.dur||0);
+  }
+  for(const id of topo.slice().reverse()){
+    const t = map.get(id);
+    const sids = succ.get(id) || [];
+    if(sids.length){
+      const lf = Math.min(...sids.map(sid => map.get(sid).LS));
+      t.LF = lf; t.LS = lf - Number(t.dur||0);
+    }
+    t.Float = t.LS - t.ES;
+    t.Critical = (t.Float === 0);
+  }
+  return { ok:true, tasks: topo.map(id=>map.get(id)), projectDuration };
+}
+function daysToDate(startDate, days){
+  const d = new Date(startDate);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0,10);
+}
+
+/* ============================================================
+   SLA Engine (gate + anchored)
+   ============================================================ */
+function splitGates(g){ return String(g||"").split("/").map(s=>s.trim()).filter(Boolean); }
+function primaryGate(g){ const gs = splitGates(g); return gs[0] || "FEL"; }
+const LEVEL_OFFSET = { "Kritisch": -0.15, "Hoch": -0.10, "Mittel": 0.00, "Niedrig": +0.10 };
+
+function buildDefaultGateWindows(projectDuration){
+  const seg = { FEL:0.15, FEED:0.20, Detail:0.20, Proc:0.15, Const:0.25, Comm:0.05 };
+  let acc = 0; const win = {};
+  for(const g of ["FEL","FEED","Detail","Proc","Const","Comm"]){
+    const start = Math.round(acc * projectDuration);
+    const end = Math.round((acc + (seg[g]||0)) * projectDuration);
+    win[g] = {start, end: Math.max(end, start+1)};
+    acc += (seg[g]||0);
+  }
+  return win;
+}
+function computeGateWindowsFromCPM(cpm){
+  const win = {};
+  if(!cpm || !cpm.ok || !cpm.tasks?.length) return win;
+  for(const t of cpm.tasks){
+    for(const g of splitGates(t.gate)){
+      if(!win[g]) win[g] = {start: Number.POSITIVE_INFINITY, end: 0};
+      win[g].start = Math.min(win[g].start, t.ES ?? 0);
+      win[g].end   = Math.max(win[g].end,   t.EF ?? 0);
+    }
+  }
+  for(const [g,v] of Object.entries(win)){
+    if(!Number.isFinite(v.start)) delete win[g];
+    else if(v.end <= v.start) v.end = v.start + 1;
+  }
+  return win;
+}
+function getGateWindow(gate, gateWin, projectDuration){
+  if(gateWin && gateWin[gate]) return gateWin[gate];
+  const def = buildDefaultGateWindows(projectDuration || 1);
+  return def[gate] || {start:0, end: Math.max(1, projectDuration||1)};
+}
+function computeDueDayForStep({gateStart, gateEnd, baseFraction, level}){
+  const offset = LEVEL_OFFSET[level] ?? 0.0;
+  const frac = clamp(0.05, baseFraction + offset, 0.95);
+  const gateLen = Math.max(1, gateEnd - gateStart);
+  const due = gateStart + Math.round(gateLen * frac);
+  return clamp(gateStart, due, gateEnd);
+}
+function indexCPMTasks(cpm){
+  const idx = new Map();
+  if(!cpm || !cpm.ok) return idx;
+  for(const t of (cpm.tasks||[])) idx.set(t.id, t);
+  return idx;
+}
+function earliestAnchorES(taskIds, taskIndex){
+  let best = null;
+  for(const id of (taskIds||[])){
+    const t = taskIndex.get(id);
+    if(!t) continue;
+    if(best===null || (t.ES < best.es)) best = {taskId:id, es:t.ES};
+  }
+  return best;
+}
+const STEP_BUFFER_FRAC = { prevention:0.07, monitoring:0.05, contingency:0.04, evidence:0.04 };
+
+function computeUpperBoundFromAnchors(stepKey, anchors, taskIndex, gateStart, gateEnd){
+  const beforeTasks = anchors?.[stepKey]?.beforeTasks || [];
+  const a = earliestAnchorES(beforeTasks, taskIndex);
+  if(!a) return { ub: gateEnd, anchor:null };
+  const gateLen = Math.max(1, gateEnd - gateStart);
+  const buffer = Math.max(1, Math.round(gateLen * (STEP_BUFFER_FRAC[stepKey] ?? 0.05)));
+  const ub = Math.max(gateStart, Math.min(gateEnd, a.es - buffer));
+  return { ub, anchor:{ taskId:a.taskId, es:a.es, buffer } };
+}
+function solveSLAWithBounds(prelim, upper, gateStart){
+  const keys = ["prevention","monitoring","contingency","evidence"];
+  const due = {...prelim};
+  for(const k of keys) due[k] = Math.max(gateStart, Math.min(due[k], upper[k]));
+  for(let i=1;i<keys.length;i++){
+    const k = keys[i], prev = keys[i-1];
+    due[k] = Math.max(due[k], due[prev]);
+    due[k] = Math.min(due[k], upper[k]);
+  }
+  for(let i=keys.length-1;i>0;i--){
+    const k = keys[i], prev = keys[i-1];
+    if(due[prev] > due[k]) due[prev] = due[k];
+  }
+  for(let i=1;i<keys.length;i++){
+    const k = keys[i], prev = keys[i-1];
+    due[k] = Math.max(due[k], due[prev]);
+    due[k] = Math.min(due[k], upper[k]);
+  }
+  const conflicts = [];
+  for(const k of keys) if(due[k] > upper[k]) conflicts.push({step:k, type:"UB_VIOLATION"});
+  for(let i=1;i<keys.length;i++) if(due[keys[i]] < due[keys[i-1]]) conflicts.push({step:keys[i], type:"ORDER_CONFLICT"});
+  return { due, conflicts };
+}
+function computeSLADueDatesForRisk(risk, ap, cpm, projectStartDate){
+  const projectDuration = (cpm && cpm.ok) ? cpm.projectDuration : 180;
+  const gateWin = computeGateWindowsFromCPM(cpm);
+  const gate = primaryGate(risk.gate);
+  const gw = getGateWindow(gate, gateWin, projectDuration);
+
+  const sla = ap?.sla || {prevention:0.25, monitoring:0.55, contingency:0.75, evidence:0.85};
+  const prelim = {
+    prevention:  computeDueDayForStep({gateStart:gw.start, gateEnd:gw.end, baseFraction:sla.prevention,  level:risk.level}),
+    monitoring:  computeDueDayForStep({gateStart:gw.start, gateEnd:gw.end, baseFraction:sla.monitoring,  level:risk.level}),
+    contingency: computeDueDayForStep({gateStart:gw.start, gateEnd:gw.end, baseFraction:sla.contingency, level:risk.level}),
+    evidence:    computeDueDayForStep({gateStart:gw.start, gateEnd:gw.end, baseFraction:sla.evidence,    level:risk.level}),
+  };
+
+  const taskIndex = indexCPMTasks(cpm);
+  const anchors = ap?.anchors || {};
+  const upper = {}, anchorsUsed = {};
+  for(const step of ["prevention","monitoring","contingency","evidence"]){
+    const {ub, anchor} = computeUpperBoundFromAnchors(step, anchors, taskIndex, gw.start, gw.end);
+    upper[step] = ub;
+    if(anchor) anchorsUsed[step] = anchor;
+  }
+
+  const solved = solveSLAWithBounds(prelim, upper, gw.start);
+  const dueDays = solved.due;
+  const toDateOrOffset = (d) => projectStartDate ? daysToDate(projectStartDate, d) : `Tag+${d}`;
+
+  const dueDates = {
+    prevention:  toDateOrOffset(dueDays.prevention),
+    monitoring:  toDateOrOffset(dueDays.monitoring),
+    contingency: toDateOrOffset(dueDays.contingency),
+    evidence:    toDateOrOffset(dueDays.evidence),
+  };
+
+  const hardConflicts = [];
+  for(const [step, a] of Object.entries(anchorsUsed)){
+    if(dueDays[step] >= a.es){
+      hardConflicts.push({ step, type:"ANCHOR_NOT_MET", taskId:a.taskId, taskES:a.es, dueDay:dueDays[step] });
+    }
+  }
+
+  return { gate, window: gw, dueDays, dueDates, anchorsUsed, conflicts: [...(solved.conflicts||[]), ...hardConflicts] };
+}
+
+/* ============================================================
+   Libraries (minimal core set)
+   ============================================================ */
+const REQUIREMENTS = [
+  { id:"REQ_ENWG_NABEG", theme:"Energie / Netz", ref:"EnWG; NABEG; BBPlG (ggf. EnLAG)",
+    desc:"Netz-/Leitungsvorhaben: Rahmen, Netzausbau- und Beschleunigungsregeln.",
+    deliverables:"Genehmigungsstrategie; Verfahrensplan; TSO-Interface-Nachweise",
+    all:["MOD_LINIE"], any:["PERM_PLANFEST","GRID_TSO"] },
+  { id:"REQ_UVPG", theme:"Genehmigung / Umwelt", ref:"UVPG (UVP/EIA)",
+    desc:"UVP: Scoping, Umweltbericht, Beteiligung; saisonale Studien möglich.",
+    deliverables:"UVP-Scoping; UVP-Bericht; Einwendungsmanagement; Behördenentscheid",
+    all:["PERM_UVPG"], any:[] },
+  { id:"REQ_BNATSCHG_FFH", theme:"Naturschutz", ref:"BNatSchG; FFH-/Vogelschutz-RL",
+    desc:"FFH-/Artenschutzprüfungen; Vermeidung/Ausgleich.",
+    deliverables:"FFH/Artenschutz; Maßnahmenplan; Monitoring",
+    all:[], any:["ENV_NATURA","ENV_SPECIES"] },
+  { id:"REQ_WHG", theme:"Wasser", ref:"WHG + Landesrecht",
+    desc:"Gewässerquerung, Schutzgebiete, Einleitungen.",
+    deliverables:"WHG-Antrag; Schutz-/Baukonzept",
+    all:[], any:["PERM_WHG","ENV_WATER_CROSS"] },
+  { id:"REQ_PED", theme:"Druck / PED", ref:"PED 2014/68/EU; EN 13480",
+    desc:"Druckgeräte-/Leitungs-Compliance.",
+    deliverables:"PED File; NDT; Abnahmen",
+    all:[], any:["PROC_PED"] },
+  { id:"REQ_ATEX", theme:"ATEX", ref:"ATEX 2014/34/EU; 1999/92/EG",
+    desc:"Zonen, Ex-Geräte, Inspektion/Qualifikation.",
+    deliverables:"Zonenplan; Ex-Liste; Inspektionen",
+    all:[], any:["PROC_ATEX"] },
+  { id:"REQ_IEC61511", theme:"Functional Safety", ref:"IEC 61511",
+    desc:"SIS Lifecycle (HAZOP/LOPA, SRS, Verifikation).",
+    deliverables:"HAZOP/LOPA; SRS; SIL Verify",
+    all:[], any:["PROC_SIS"] },
+  { id:"REQ_IEC62443", theme:"OT Security", ref:"IEC 62443",
+    desc:"Security-Konzept, Segmentierung, Hardening, Access.",
+    deliverables:"Security Design; Reviews; Pentest",
+    all:[], any:["GRID_CYBER","MOD_SCADA"] },
+];
+
+const ACTION_PLANS = [
+  { id:"AP_PERMIT_DELAY",
+    prevention:"Genehmigungs-/Behördenmatrix; Scoping; Vollständigkeitscheck; Permit Manager.",
+    monitoring:"Status-Tracker; offene Punkte; Behördenprotokolle.",
+    contingency:"Re-Baselining; Ressourcen hoch; Varianten; Phasierung.",
+    owner:"Permitting Lead / Projektleitung",
+    evidence:"Genehmigungsplan; Einreichpakete; Auflagenregister",
+    sla:{ prevention:0.20, monitoring:0.45, contingency:0.70, evidence:0.85 },
+    anchors:{ prevention:{beforeTasks:["T2_APP"]}, monitoring:{beforeTasks:["T2_PUBLIC"]}, contingency:{beforeTasks:["T2_DECISION"]}, evidence:{beforeTasks:["T2_DECISION"]} }
+  },
+  { id:"AP_UVPG_NATURA",
+    prevention:"Frühkartierungen; Layout/Trasse optimieren; Vermeidung; Kompensation.",
+    monitoring:"Gutachter-Fortschritt; Behördenfeedback; Einwendungen.",
+    contingency:"Bauzeitfenster anpassen; alternative Verfahren.",
+    owner:"Umweltleiter/in",
+    evidence:"FFH/Artenschutz; Karten; Auflagen; Monitoring",
+    sla:{ prevention:0.10, monitoring:0.35, contingency:0.55, evidence:0.75 },
+    anchors:{ prevention:{beforeTasks:["T1_FIELD"]}, monitoring:{beforeTasks:["T2_APP"]}, contingency:{beforeTasks:["T2_PUBLIC"]}, evidence:{beforeTasks:["T2_APP"]} }
+  },
+  { id:"AP_LONG_LEAD",
+    prevention:"Long-Lead Liste; Dual Sourcing; Expediting; QA; Meilensteine.",
+    monitoring:"OTIF; Fertigungsfortschritt; Lieferantenrisiko.",
+    contingency:"Alternativlieferant; Express; Re-Sequencing.",
+    owner:"Procurement Lead",
+    evidence:"Expediting; FAT; Lieferpläne; NCR Closeout",
+    sla:{ prevention:0.10, monitoring:0.35, contingency:0.55, evidence:0.70 },
+    anchors:{ prevention:{beforeTasks:["T4_PO"]}, monitoring:{beforeTasks:["T4_FAT"]}, contingency:{beforeTasks:["T7_PRECOMM"]}, evidence:{beforeTasks:["T7_PRECOMM"]} }
+  },
+  { id:"AP_ATEX_PED_SIS",
+    prevention:"Ex/PED/SIS Dossier früh; Verifikation; MOC.",
+    monitoring:"HAZOP Actions; Ex-Inspektionen; PED Dossier; SIL Verify.",
+    contingency:"Redesign/Retrofit; Austausch; zusätzliche Tests.",
+    owner:"Process Safety / Mechanical / ICSS",
+    evidence:"Ex; PED; HAZOP/LOPA; SRS; Prüfberichte",
+    sla:{ prevention:0.25, monitoring:0.55, contingency:0.75, evidence:0.85 },
+    anchors:{ prevention:{beforeTasks:["T7_PRECOMM"]}, monitoring:{beforeTasks:["T7_PRECOMM"]}, contingency:{beforeTasks:["T7_PRECOMM"]}, evidence:{beforeTasks:["T7_PRECOMM"]} }
+  },
+  { id:"AP_CYBER_OT",
+    prevention:"Segmentierung; MFA; Hardening; Patch; Remote Access Governance.",
+    monitoring:"Scans; Logs; Access Audit; Patch Compliance.",
+    contingency:"Isolation; IR Plan; Restore; Forensik.",
+    owner:"OT/IT Security Lead",
+    evidence:"Security-Konzept; Diagrams; Pentest; SOPs",
+    sla:{ prevention:0.20, monitoring:0.45, contingency:0.65, evidence:0.80 },
+    anchors:{ prevention:{beforeTasks:["T7_PRECOMM"]}, monitoring:{beforeTasks:["T7_GRID_SAT"]}, contingency:{beforeTasks:["T7_GRID_SAT"]}, evidence:{beforeTasks:["T7_GRID_SAT"]} }
+  },
+];
+
+function findActionPlan(id){ return ACTION_PLANS.find(x=>x.id===id); }
+
+const RISKS = [
+  { id:"R_PERM_01", cat:"Genehmigung",
+    risk:"Verzögerung/Unvollständigkeit im Genehmigungsverfahren (Planfeststellung/BImSchG/UVP).",
+    cause:"Unvollständige Unterlagen; Scope-Änderungen; späte Auflagen.",
+    all:[], any:["PERM_PLANFEST","PERM_BIMSCHG","PERM_UVPG"], req:["REQ_UVPG","REQ_ENWG_NABEG"],
+    p:3, i:5, ap:"AP_PERMIT_DELAY", gate:"FEL/FEED" },
+
+  { id:"R_ENV_01", cat:"Umwelt/Naturschutz",
+    risk:"Natura2000/Artenschutz erzwingt Bauzeitfenster oder Trassen-/Layoutänderung.",
+    cause:"Saisonale Restriktionen; Habitatbetroffenheit.",
+    all:[], any:["ENV_NATURA","ENV_SPECIES"], req:["REQ_BNATSCHG_FFH","REQ_UVPG"],
+    p:4, i:4, ap:"AP_UVPG_NATURA", gate:"FEL/FEED" },
+
+  { id:"R_SUP_01", cat:"Lieferkette",
+    risk:"Long-Lead Equipment verspätet (Trafo, GIS, Turbine, Ventile).",
+    cause:"Kapazität; QA/NCRs; Schnittstellen.",
+    all:[], any:["MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"], req:["REQ_PED"],
+    p:4, i:4, ap:"AP_LONG_LEAD", gate:"Proc/Const" },
+
+  { id:"R_PROC_01", cat:"Prozess/ATEX/PED/SIS",
+    risk:"ATEX/PED/SIS unzureichend → Austausch/Abnahmeverzug/Inbetriebnahmeverzug.",
+    cause:"Studien/Verifikation zu spät; Lieferantenabweichungen.",
+    all:[], any:["PROC_ATEX","PROC_PED","PROC_SIS","MOD_COAL2GAS","MOD_THERMO"], req:["REQ_ATEX","REQ_PED","REQ_IEC61511"],
+    p:3, i:5, ap:"AP_ATEX_PED_SIS", gate:"Detail/Comm" },
+
+  { id:"R_CYB_01", cat:"OT/Cyber",
+    risk:"OT-/SCADA-Schwachstellen → Incident/Stillstand/Abnahmeverzug.",
+    cause:"Keine Segmentierung; ungepatcht; Lieferkette.",
+    all:[], any:["MOD_SCADA","GRID_CYBER"], req:["REQ_IEC62443"],
+    p:3, i:5, ap:"AP_CYBER_OT", gate:"Detail/Comm" },
+];
+
+const TASKS = [
+  { id:"T0_KICKOFF", name:"Projektstart/Kick-off + Rollen & Governance", module:"Transversal", dur:5, pred:[], deliver:"RACI/Comms", owner:"Projektleitung", gate:"FEL",
+    all:[], any:["MOD_LINIE","MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"] },
+  { id:"T0_REQ", name:"Anforderungs- & Compliance-Register (Traceability)", module:"Transversal", dur:10, pred:["T0_KICKOFF"], deliver:"Legal/Normen Register", owner:"Compliance/Eng", gate:"FEL",
+    all:[], any:["MOD_LINIE","MOD_UMSPANN","MOD_THERMO","MOD_COAL2GAS"] },
+
+  { id:"T1_SCOPING", name:"Genehmigungsstrategie/Behörden-Scoping", module:"Genehmigung", dur:15, pred:["T0_REQ"], deliver:"Permit-Fahrplan", owner:"Permitting", gate:"FEL",
+    all:[], any:["PERM_PLANFEST","PERM_BIMSCHG","PERM_UVPG"] },
+
+  { id:"T1_UVP_SCOP", name:"UVP Scoping (Untersuchungsrahmen)", module:"Genehmigung/Umwelt", dur:25, pred:["T1_SCOPING"], deliver:"Scoping-Unterlagen", owner:"Umwelt", gate:"FEL",
+    all:["PERM_UVPG"], any:[] },
+
+  { id:"T1_FIELD", name:"Umwelt-/Feldkartierungen (Saisonzyklus)", module:"Genehmigung/Umwelt", dur:120, pred:["T1_UVP_SCOP"], deliver:"Kartierberichte", owner:"Umwelt", gate:"FEL/FEED",
+    all:[], any:["ENV_NATURA","ENV_SPECIES","PERM_UVPG"] },
+
+  { id:"T2_APP", name:"Genehmigungsantrag erstellen & einreichen", module:"Genehmigung", dur:60, pred:["T1_SCOPING"], deliver:"Einreichpaket", owner:"Permitting", gate:"FEED",
+    all:[], 
